@@ -18,12 +18,6 @@ Base.metadata.create_all(engine)
 TOKEN = "954911221:AAF12xXEVwl2KRsy1Qe0RvWcm-6bmd2MW7k"
 URL = f"https://api.telegram.org/bot{TOKEN}"
 getUpdates = URL + "/getUpdates"
-proxies = {
-    'http': '96.96.36.118:3128',
-    'https': '96.96.36.118:3128'
-}
-
-Wait = 30
 
 Base.metadata.bind = engine
 Session = sessionmaker(bind=engine)
@@ -67,7 +61,7 @@ def timed_job():
             timering.last_ans_count=0
             session.add(timering)
             session.commit()
-            requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+            requests.get(URL + "/sendMessage", params=params)
 
 
 sched.start()
