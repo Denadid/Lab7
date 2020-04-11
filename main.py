@@ -54,17 +54,22 @@ class Users(Base):
     mutex = Column(Integer, nullable=True)
 
     def Create(self, User_id, Name, last_ans=None, last_ans_count=None, last_position=-1, last_try_count=0, last_word='', mutex=0):
+        session = Session()
         user = Users(User_id=User_id, Name=Name, last_ans=last_ans, last_ans_count=last_ans_count,
                      last_position=last_position, last_try_count=last_try_count,last_word=last_word, mutex=mutex)
         session.add(user)
         session.commit()
+        session.close()
         return user
 
     def Find(self,User_id):
+        session = Session()
         FindUser = session.query(Users).filter_by(User_id=User_id).first()
+        session.close()
         return FindUser
 
     def Update(self,User_id, last_ans=None, last_ans_count=None, last_position=None, last_try_count=None, last_word=None, mutex=None):
+        session = Session()
         FindUser = session.query(Users).filter_by(User_id=User_id).first()
         if FindUser is not None:
             if last_ans is not None:
@@ -81,6 +86,7 @@ class Users(Base):
                 FindUser.mutex = mutex
             session.add(FindUser)
             session.commit()
+        session.close()
         return FindUser
 
 class Learning(Base):
@@ -93,16 +99,21 @@ class Learning(Base):
     user_id = relationship(Users)
 
     def Create(self, User_id, word, count_, last_ans):
+        session = Session()
         learn = Learning(User_id=User_id, word=word, count_=count_, last_ans=last_ans)
         session.add(learn)
         session.commit()
+        session.close()
         return learn
 
     def Find(self, User_id, word):
+        session = Session()
         FindLearn = session.query(Learning).filter_by(User_id=User_id, word=word).first()
+        session.close()
         return FindLearn
 
     def Update(self, User_id, word, count_=None, last_ans=None):
+        session = Session()
         FindLearn = session.query(Learning).filter_by(User_id=User_id, word=word).first()
         if FindLearn is not None:
             if count_ is not None:
@@ -111,6 +122,7 @@ class Learning(Base):
                 FindLearn.last_ans = last_ans
             session.add(FindLearn)
             session.commit()
+        session.close()
         return FindLearn
 
 UsersDB = Users()
@@ -130,6 +142,7 @@ def incoming():
         "chat_id": chatID,
         "text": ''
     }
+    session = Session()
     stgs = session.query(Settings).first()
     IsFind = False
     FindUser = ''
@@ -137,6 +150,7 @@ def incoming():
     if not FindUser:
         FindUser = UsersDB.Create(User_id=chatID,Name= FName)
     if FindUser.mutex != 0:
+        session.close()
         return "end"
     else:
         FindUser = UsersDB.Update(chatID,mutex=1)
@@ -150,16 +164,19 @@ def incoming():
         requests.get(URL + "/sendMessage", params=params)
     if text == '/start' and FindUser.last_position != -1:
         FindUser = UsersDB.Update(chatID, mutex=0)
+        session.close()
         return Response(status=200)
     print(text)
     if text == "Отложить":
         FindUser = UsersDB.Update(chatID, mutex=0)
+        session.close()
         return "end"
 
     if text == "Начать игру" and FindUser.last_position == -1:
         FindUser = UsersDB.Update(User_id=FindUser.User_id,last_ans_count= 0,last_try_count=FindUser.last_try_count +1 ,last_position= 0)
     if text == "Начать игру" and FindUser.last_position > 0:
         FindUser = UsersDB.Update(chatID, mutex=0)
+        session.close()
         return Response(status=200)
 
     if FindUser.last_word != '' and FindUser.last_word is not None:
@@ -172,6 +189,7 @@ def incoming():
             params['text'] = random.choice(word['examples'])
             requests.get(URL + "/sendMessage", params=params)
             FindUser = UsersDB.Update(chatID, mutex=0)
+            session.close()
             return 'end'
         else:
             if text== word['translation']:
@@ -224,6 +242,7 @@ def incoming():
         FindUser = UsersDB.Update(User_id=chatID,last_word=word['word'], last_position=FindUser.last_position+1)
         requests.get(URL + "/sendMessage", params=params)
         FindUser = UsersDB.Update(chatID, mutex=0)
+        session.close()
         return "end"
     if FindUser.last_position >= stgs.count:
 
@@ -233,6 +252,7 @@ def incoming():
         requests.get(URL + "/sendMessage", params=params)
         UsersDB.Update(User_id=chatID, last_word='', last_position=-1, last_ans_count=0)
         FindUser = UsersDB.Update(chatID, mutex=0)
+        session.close()
         return "end"
 
     if text == "Просмотр прогресса":
@@ -248,6 +268,7 @@ def incoming():
                          f'{last_ans}'
         requests.get(URL + "/sendMessage", params=params)
     FindUser = UsersDB.Update(chatID, mutex=0)
+    session.close()
     return "end"
 
 @app.route('/', methods=['GET'])
@@ -257,12 +278,15 @@ def index():
 
 @app.route('/settings')
 def settings():
+    session = Session()
     stgs = session.query(Settings).first()
+    session.close()
     return render_template("settings.html", time=stgs.time,count=stgs.count,right=stgs.right)
 
 
 @app.route('/setup', methods=['POST'])
 def setup():
+    session = Session()
     time = int(request.form.get('time'))
     count = int(request.form.get('count'))
     right = int(request.form.get('right'))
@@ -272,6 +296,7 @@ def setup():
     stgs.right=right
     session.add(stgs)
     session.commit()
+    session.close()
     return "200"
 
 if __name__ == '__main__':
