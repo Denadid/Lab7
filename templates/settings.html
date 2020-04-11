@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройки</title>
+</head>
+<body>
+    <form action="/setup" method="POST">
+       <label>Время, через которое бот будет напоминать о необходимости повторить слова(минуты) <input type="text" name="time"  value={{time}}></label> <br>
+       <label>Количество слов в одном раунде заучивания                                         <input type="text" name="count" value={{count}}></label> <br>
+       <label>Количество правильных ответов, после которых считается, что слово выучено.        <input type="text" name="right" value={{right}}></label> <br>
+       <button type="submit"> Ок </button>
+    </form>
+</body>
+</html>

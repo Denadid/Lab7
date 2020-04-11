@@ -1,0 +1,20 @@
+{
+    "keyboard": [
+        [
+            {
+                "text": "Contact21",
+                "request_location": true
+            },
+            "No"
+        ],
+        [
+            "Maybe"
+        ],
+        [
+            "1",
+            "2",
+            "3"
+        ]
+    ],
+    "resize_keyboard": true
+}
