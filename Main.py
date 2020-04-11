@@ -12,7 +12,7 @@ import datetime
 
 app = Flask(__name__)
 Base = declarative_base()
-engine = create_engine('sqlite:///example.db',connect_args={'check_same_thread': False})
+engine = create_engine('postgres://enxkniceyqqomp:e191eb2cfd81e6311cb78104205e3fde97ebb8aab36e76013320bf34d6a9ff41@ec2-46-137-156-205.eu-west-1.compute.amazonaws.com:5432/d1e5a7pi1nolg1',connect_args={'check_same_thread': False})
 Base.metadata.create_all(engine)
 
 Base.metadata.bind = engine
@@ -22,10 +22,6 @@ session = Session()
 TOKEN = "954911221:AAF12xXEVwl2KRsy1Qe0RvWcm-6bmd2MW7k"
 URL = f"https://api.telegram.org/bot{TOKEN}"
 getUpdates = URL + "/getUpdates"
-proxies = {
-    'http': '96.96.36.118:3128',
-    'https': '96.96.36.118:3128'
-}
 
 with open('english_words.json', 'r', encoding='utf-8') as j:
     words = json.load(j)
@@ -135,18 +131,11 @@ def incoming():
         "text": ''
     }
     stgs = session.query(Settings).first()
-    #return Response(status=200)
-    #Session = sessionmaker(bind=engine)
-    #session = Session()
     IsFind = False
     FindUser = ''
-    # FindUser = query.execute(f''' Select* from Users where User_id = {chatID} ''').fetchone()
     FindUser = UsersDB.Find(User_id = chatID)
     if not FindUser:
-        # query.execute(f''' INSERT INTO Users  VALUES ({chatID},'{FName}',null,null,-1,0,null) ''')
         FindUser = UsersDB.Create(User_id=chatID,Name= FName)
-        # conn.commit()
-        # FindUser = query.execute(f''' Select* from Users where User_id = {chatID} ''').fetchone()
     if FindUser.mutex != 0:
         return "end"
     else:
@@ -158,7 +147,7 @@ def incoming():
                          f'Всего будет {stgs.count} слов, после чего ты узнаешь сколько слов было отгадано. ' \
                          f'Не переживай, я буду тебе подсказывать, но только на английском хихи =)'
         params['reply_markup'] = json.dumps(go_button)
-        requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+        requests.get(URL + "/sendMessage", params=params)
     if text == '/start' and FindUser.last_position != -1:
         FindUser = UsersDB.Update(chatID, mutex=0)
         return Response(status=200)
@@ -168,13 +157,7 @@ def incoming():
         return "end"
 
     if text == "Начать игру" and FindUser.last_position == -1:
-
-        # query.execute(f'''UPDATE Users SET  last_ans_count = 0,
-        #                                     last_try_count = {FindUser[5] + 1},
-        #                                     last_position = 0
-        #                                     WHERE User_id = {FindUser[0]}''')
         FindUser = UsersDB.Update(User_id=FindUser.User_id,last_ans_count= 0,last_try_count=FindUser.last_try_count +1 ,last_position= 0)
-        # conn.commit()
     if text == "Начать игру" and FindUser.last_position > 0:
         FindUser = UsersDB.Update(chatID, mutex=0)
         return Response(status=200)
@@ -187,59 +170,31 @@ def incoming():
                 break
         if text == "привести пример":
             params['text'] = random.choice(word['examples'])
-            requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+            requests.get(URL + "/sendMessage", params=params)
             FindUser = UsersDB.Update(chatID, mutex=0)
             return 'end'
         else:
             if text== word['translation']:
                 params['text'] = 'А ты молодец) Правильный ответ!'
                 requests.get(URL + "/sendMessage", params=params, proxies=proxies)
-
-                # query.execute(f'''UPDATE Users SET last_ans = '{str(datetime.datetime.now())}',
-                #                                    last_ans_count = {FindUser[3]+1},
-                #                                    last_position = {FindUser[4]+1}
-                #                                    WHERE User_id = {FindUser[0]}''')
                 FindUser = UsersDB.Update(User_id=FindUser.User_id,
                                last_ans_count=(FindUser.last_ans_count+1),
                                last_ans = str(datetime.datetime.now()))
-                # conn.commit()
-
-                # count = query.execute(f''' Select *
-                #                    FROM Learning
-                #                    WHERE User_id = {chatID}
-                #                    AND word = '{word['word']}'
-                #                    ''').fetchone()
                 count = LearningDB.Find(User_id= chatID,word = word['word'])
                 if not count:
-                    # query.execute(f''' INSERT INTO Learning(User_id, word, count_, last_ans) VALUES ({chatID},'{word['word']}',1,'{str(datetime.datetime.now())}') ''')
-                    # conn.commit()
                     LearningDB.Create(User_id= chatID,word=word['word'],count_=1,last_ans=str(datetime.datetime.now()))
                 else:
-                    # query.execute(f'''UPDATE Learning SET count_ = {count[3]+1},
-                    #                                       last_ans = '{str(datetime.datetime.now())}'
-                    #                                       WHERE ID_learning = {count[0]}''')
-                    # conn.commit()
                     LearningDB.Update(User_id=chatID,word = word['word'],count_=count.count_+1,last_ans=str(datetime.datetime.now()) )
             else:
                 params['text'] = f'К сожалению это неправильный ответ =( ' \
                                  f'На самом деле это: {word["translation"]}'
-                requests.get(URL + "/sendMessage", params=params, proxies=proxies)
-
-                # query.execute(f'''UPDATE Users SET last_ans = '{str(datetime.datetime.now())}',
-                #                                                    last_position = {FindUser[4]+1}
-                #                                                    WHERE User_id = {FindUser[0]}''')
-                # conn.commit()
+                requests.get(URL + "/sendMessage", params=params)
                 FindUser = UsersDB.Update(User_id= chatID,last_ans= str(datetime.datetime.now()))
 
     if FindUser.last_position in range(0, stgs.count):
         isFind = False
         while not isFind:
             word = random.choice(words)
-            # count = query.execute(f''' Select *
-            #                            FROM Learning
-            #                            WHERE User_id = {chatID}
-            #                            AND word = '{word['word']}'
-            #                         ''').fetchone()
             count = LearningDB.Find(User_id= chatID,word = word['word'])
             if count and count.count_ < FindUser.last_ans_count-1 and count.count_ <= stgs.right:
                 isFind = True
@@ -266,33 +221,22 @@ def incoming():
         params['reply_markup'] = json.dumps(reply_markup)
         params['text'] = word['word']
 
-        # query.execute(f'''UPDATE Users SET last_word = '{word['word']}'
-        #                                WHERE User_id = {FindUser[0]}''')
-        # conn.commit()
-        # FindUser = query.execute(f''' Select* from Users where User_id = {chatID} ''').fetchone()
         FindUser = UsersDB.Update(User_id=chatID,last_word=word['word'], last_position=FindUser.last_position+1)
-        requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+        requests.get(URL + "/sendMessage", params=params)
         FindUser = UsersDB.Update(chatID, mutex=0)
         return "end"
     if FindUser.last_position >= stgs.count:
-        # query.execute(f'''UPDATE Users SET last_ans_count = 0,
-        #                                last_position = -1,
-        #                                last_word = null
-        #                                WHERE User_id = {FindUser[0]}''')
-        # conn.commit()
 
         params["text"] = f'Игра закончена, {FName}, ты ответил(а) правильно на {FindUser.last_ans_count} из {stgs.count} возможных. ' \
                          f'Хочешь сыграть еще раз? =)'
         params['reply_markup'] = json.dumps(go_button)
-        requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+        requests.get(URL + "/sendMessage", params=params)
         UsersDB.Update(User_id=chatID, last_word='', last_position=-1, last_ans_count=0)
         FindUser = UsersDB.Update(chatID, mutex=0)
         return "end"
 
     if text == "Просмотр прогресса":
-        # learned_words = query.execute(f'''SELECT * FROM Learning WHERE count_ >= {max_level}''').fetchall()
         learned_words = session.query(Learning).filter(Learning.count_ >= stgs.right).all()
-        # learning_words = query.execute(f'''SELECT * FROM Learning WHERE count_ < {max_level}''').fetchall()
         learning_words = session.query(Learning).filter(Learning.count_ < stgs.right).all()
         last_ans = FindUser.last_ans
         count_learned_words = len(learned_words)
@@ -302,7 +246,7 @@ def incoming():
                          f'Слов изучается: {count_learning_words} \n' \
                          f'Последнее время прохождения теста: \n' \
                          f'{last_ans}'
-        requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+        requests.get(URL + "/sendMessage", params=params)
     FindUser = UsersDB.Update(chatID, mutex=0)
     return "end"
 
