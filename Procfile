@@ -1,2 +1,2 @@
-web gunicorn Main:app
-clock: python Clock.py
+web gunicorn main:app
+clock: python clock.py
