@@ -157,6 +157,7 @@ def incoming():
         FindUser = UsersDB.Create(User_id=chatID,Name= FName)
         print("Создали")
     print("Чекаем мутекс")
+    print(FindUser.mutex)
     if FindUser.mutex != 0:
         print("Мутекс не ноль, закрываем сессию")
         session.close()
