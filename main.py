@@ -147,6 +147,7 @@ def incoming():
     print("Начало")
     session = Session()
     stgs = session.query(Settings).first()
+    session.close()
     print("Получили Сеттингс")
     IsFind = False
     FindUser = ''
@@ -159,9 +160,7 @@ def incoming():
     print("Чекаем мутекс")
     print(FindUser.mutex)
     if FindUser.mutex != 0:
-        print("Мутекс не ноль, закрываем сессию")
-        session.close()
-        print("Закрыли")
+        print("Мутекс не ноль, выкинули запрос")
         return "end"
     else:
         print("Лочим мутекс обновляем пользователя в бд")
@@ -178,15 +177,15 @@ def incoming():
         requests.get(URL + "/sendMessage", params=params)
         print("Реакция на СТАРТ Конец")
     if text == '/start' and FindUser.last_position != -1:
-        print("Освобождаем мутекс и закрываем сессию из за повторного нажатия старт")
+        print("Освобождаем мутекс и выкидываем запрос из за повторного нажатия старт")
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
         print("Успешно")
         return Response(status=200)
     print(text)
     if text == "Отложить":
+        print("Откладываем игру на потом, освобождаем мутекс")
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
+        print("Готово")
         return "end"
 
     if text == "Начать игру" and FindUser.last_position == -1:
@@ -196,7 +195,6 @@ def incoming():
     if text == "Начать игру" and FindUser.last_position > 0:
         print("Повторная попытка начать игру, выкидываем запрос в мусорку")
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
         print("Выкинули")
         return Response(status=200)
 
@@ -210,7 +208,6 @@ def incoming():
             params['text'] = random.choice(word['examples'])
             requests.get(URL + "/sendMessage", params=params)
             FindUser = UsersDB.Update(chatID, mutex=0)
-            session.close()
             return 'end'
         else:
             if text== word['translation']:
@@ -263,7 +260,6 @@ def incoming():
         FindUser = UsersDB.Update(User_id=chatID,last_word=word['word'], last_position=FindUser.last_position+1)
         requests.get(URL + "/sendMessage", params=params)
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
         return "end"
     if FindUser.last_position >= stgs.count:
 
@@ -273,10 +269,10 @@ def incoming():
         requests.get(URL + "/sendMessage", params=params)
         UsersDB.Update(User_id=chatID, last_word='', last_position=-1, last_ans_count=0)
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
         return "end"
 
     if text == "Просмотр прогресса":
+        session = Session()
         learned_words = session.query(Learning).filter(Learning.count_ >= stgs.right).all()
         learning_words = session.query(Learning).filter(Learning.count_ < stgs.right).all()
         last_ans = FindUser.last_ans
@@ -287,9 +283,9 @@ def incoming():
                          f'Слов изучается: {count_learning_words} \n' \
                          f'Последнее время прохождения теста: \n' \
                          f'{last_ans}'
+        session.close()
         requests.get(URL + "/sendMessage", params=params)
     FindUser = UsersDB.Update(chatID, mutex=0)
-    session.close()
     return "end"
 
 @app.route('/', methods=['GET'])
