@@ -48,7 +48,7 @@ def timed_job1():
     print('Не спать!')
     requests.get("https://65db1cf0.ngrok.io", params=params)
 
-@sched.scheduled_job('interval', minutes=1)
+@sched.scheduled_job('interval', seconds=5)
 def timed_job():
     session = Session()
     stgs = session.query(Settings).first()
