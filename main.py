@@ -338,7 +338,7 @@ def setup():
         print("Пустой сеттингс")
     session.close()
     print("Done !!!!!!!!!!")
-    return "Done"
+    return render_template("index.html")
 
 if __name__ == '__main__':
     app.run();
