@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Настройки</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
 </head>
 <body>
-    <form action="/setup" method="POST">
-       <label>Время, через которое бот будет напоминать о необходимости повторить слова(минуты) <input type="text" name="time"  value={{time}}></label> <br>
-       <label>Количество слов в одном раунде заучивания                                         <input type="text" name="count" value={{count}}></label> <br>
-       <label>Количество правильных ответов, после которых считается, что слово выучено.        <input type="text" name="right" value={{right}}></label> <br>
+    <form action="/setup" method="POST" class="front">
+       <label>Время, через которое бот будет напоминать о необходимости повторить слова(минуты) <br><input type="text" name="time"  value={{time}}></label> <br>
+       <label>Количество слов в одном раунде заучивания                                        <br> <input type="text" name="count" value={{count}}></label> <br>
+       <label>Количество правильных ответов, после которых считается, что слово выучено.       <br> <input type="text" name="right" value={{right}}></label> <br>
        <button type="submit"> Ок </button>
     </form>
 </body>
