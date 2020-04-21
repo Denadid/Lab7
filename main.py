@@ -302,10 +302,12 @@ def setup():
         stgs.right=right
         session.add(stgs)
         session.commit()
+        print("Не Пустой сеттингс")
     else:
         stgsCr = Settings(id=1, time=time, count=count, right=right)
         session.add(stgsCr)
         session.commit()
+        print("Пустой сеттингс")
     session.close()
     print("Done !!!!!!!!!!")
     return "Done"
