@@ -60,6 +60,7 @@ def timed_job():
             timering.last_word=''
             timering.last_position=-1
             timering.last_ans_count=0
+            timering.last_ans = datetime.datetime.now()
             session.add(timering)
             session.commit()
             requests.get(URL + "/sendMessage", params=params)
