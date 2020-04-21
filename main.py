@@ -301,7 +301,7 @@ def setup():
     session.add(stgs)
     session.commit()
     session.close()
-    return "200"
+    return "Done"
 
 if __name__ == '__main__':
     app.run();
