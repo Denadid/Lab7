@@ -144,18 +144,25 @@ def incoming():
         "chat_id": chatID,
         "text": ''
     }
+    print("Начало")
     session = Session()
     stgs = session.query(Settings).first()
+    print("Получили Сеттингс")
     IsFind = False
     FindUser = ''
     FindUser = UsersDB.Find(User_id = chatID)
+    print("Ищем юзера")
     if not FindUser:
+        print("Создаем нового юзера")
         FindUser = UsersDB.Create(User_id=chatID,Name= FName)
     if FindUser.mutex != 0:
+        print("Мутекс не ноль, закрываем сессию")
         session.close()
         return "end"
     else:
+        print("Лочим мутекс обновляем пользователя в бд")
         FindUser = UsersDB.Update(chatID,mutex=1)
+        print("Обновили")
     go_button = {"keyboard": [["Начать игру"],["Просмотр прогресса"]], "resize_keyboard": True}
     if text == '/start' and FindUser.last_position == -1:
         print("Реакция на СТАРТ")
@@ -167,8 +174,10 @@ def incoming():
         requests.get(URL + "/sendMessage", params=params)
         print("Реакция на СТАРТ Конец")
     if text == '/start' and FindUser.last_position != -1:
+        print("Освобождаем мутекс и закрываем сессию из за повторного нажатия старт")
         FindUser = UsersDB.Update(chatID, mutex=0)
-        #session.close()
+        session.close()
+        print("Успешно")
         return Response(status=200)
     print(text)
     if text == "Отложить":
@@ -177,10 +186,14 @@ def incoming():
         return "end"
 
     if text == "Начать игру" and FindUser.last_position == -1:
+        print("Начинаем игру, обновляем БД юзера")
         FindUser = UsersDB.Update(User_id=FindUser.User_id,last_ans_count= 0,last_try_count=FindUser.last_try_count +1 ,last_position= 0)
+        print("Обновили")
     if text == "Начать игру" and FindUser.last_position > 0:
+        print("Повторная попытка начать игру, выкидываем запрос в мусорку")
         FindUser = UsersDB.Update(chatID, mutex=0)
         session.close()
+        print("Выкинули")
         return Response(status=200)
 
     if FindUser.last_word != '' and FindUser.last_word is not None:
