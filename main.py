@@ -57,20 +57,12 @@ class Users(Base):
         session = Session()
         user = Users(User_id=User_id, Name=Name, last_ans=last_ans, last_ans_count=last_ans_count,
                      last_position=last_position, last_try_count=last_try_count,last_word=last_word, mutex=mutex)
-        print("Юзер в креате !:")
-        print(user.Name)
+        print(user)
         session.add(user)
         session.commit()
-        print("Юзер в креате перед close !:")
-        print(user.Name)
+        print(user)
         session.close()
-        print("тип юзера в креате перед ретурном !:")
-        print(type(user))
-        print("Юзер в креате перед ретурном !:")
-        if user.Name is None:
-            print("мы в жопе")
-        else:    
-            print(user)
+        print(user)
         return user
 
     def Find(self,User_id):
@@ -97,7 +89,9 @@ class Users(Base):
                 FindUser.mutex = mutex
             session.add(FindUser)
             session.commit()
+        print(FindUser)    
         session.close()
+        print(FindUser)
         return FindUser
 
 class Learning(Base):
