@@ -290,6 +290,7 @@ def settings():
 
 @app.route('/setup', methods=['POST'])
 def setup():
+    print("Start !!!!!!!!")
     session = Session()
     time = int(request.form.get('time'))
     count = int(request.form.get('count'))
@@ -301,6 +302,7 @@ def setup():
     session.add(stgs)
     session.commit()
     session.close()
+    print("Done !!!!!!!!!!")
     return "Done"
 
 if __name__ == '__main__':
