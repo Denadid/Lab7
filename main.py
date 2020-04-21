@@ -65,7 +65,10 @@ class Users(Base):
         print("тип юзера в креате перед ретурном !:")
         print(type(user))
         print("Юзер в креате перед ретурном !:")
-        print(user)
+        if user.Name is None:
+            print("мы в жопе")
+        else:    
+            print(user)
         return user
 
     def Find(self,User_id):
