@@ -42,7 +42,7 @@ class Users(Base):
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', seconds=30)
+@sched.scheduled_job('interval', minutes=30)
 def timed_job1():
     params = {"text": 'Не спать!'}
     print('Не спать!')
