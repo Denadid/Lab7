@@ -62,10 +62,10 @@ class Users(Base):
         session.add(user)
         session.commit()
         session.close()
-        print("Юзер в креате перед ретурном !:")
-        print(user.Name)
         print("тип юзера в креате перед ретурном !:")
         print(type(user))
+        print("Юзер в креате перед ретурном !:")
+        print(user.Name)
         return user
 
     def Find(self,User_id):
