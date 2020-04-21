@@ -61,6 +61,8 @@ class Users(Base):
         print(user.Name)
         session.add(user)
         session.commit()
+        print("Юзер в креате перед close !:")
+        print(user.Name)
         session.close()
         print("тип юзера в креате перед ретурном !:")
         print(type(user))
