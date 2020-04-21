@@ -296,11 +296,16 @@ def setup():
     count = int(request.form.get('count'))
     right = int(request.form.get('right'))
     stgs = session.query(Settings).first()
-    stgs.time=time
-    stgs.count=count
-    stgs.right=right
-    session.add(stgs)
-    session.commit()
+    if stgs is not None:
+        stgs.time=time
+        stgs.count=count
+        stgs.right=right
+        session.add(stgs)
+        session.commit()
+    else:
+        stgsCr = Settings(id=1, time=time, count=count, right=right)
+        session.add(stgs)
+        session.commit()
     session.close()
     print("Done !!!!!!!!!!")
     return "Done"
