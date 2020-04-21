@@ -158,15 +158,17 @@ def incoming():
         FindUser = UsersDB.Update(chatID,mutex=1)
     go_button = {"keyboard": [["Начать игру"],["Просмотр прогресса"]], "resize_keyboard": True}
     if text == '/start' and FindUser.last_position == -1:
+        print("Реакция на СТАРТ")
         params["text"] = f'Привет {FName}, давай сыграем в игру, где я буду давать тебе какое-нибудь слово на ' \
                          f'английском, а ты в свою очередь будешь отгадывать его перевод. ' \
                          f'Всего будет {stgs.count} слов, после чего ты узнаешь сколько слов было отгадано. ' \
                          f'Не переживай, я буду тебе подсказывать, но только на английском хихи =)'
         params['reply_markup'] = json.dumps(go_button)
         requests.get(URL + "/sendMessage", params=params)
+        print("Реакция на СТАРТ Конец")
     if text == '/start' and FindUser.last_position != -1:
         FindUser = UsersDB.Update(chatID, mutex=0)
-        session.close()
+        #session.close()
         return Response(status=200)
     print(text)
     if text == "Отложить":
