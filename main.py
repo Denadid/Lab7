@@ -57,6 +57,8 @@ class Users(Base):
         session = Session()
         user = Users(User_id=User_id, Name=Name, last_ans=last_ans, last_ans_count=last_ans_count,
                      last_position=last_position, last_try_count=last_try_count,last_word=last_word, mutex=mutex)
+        print("Юзер в креате !:")
+        print(user.Name)
         session.add(user)
         session.commit()
         session.close()
