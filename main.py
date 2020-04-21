@@ -57,18 +57,9 @@ class Users(Base):
         session = Session()
         user = Users(User_id=User_id, Name=Name, last_ans=last_ans, last_ans_count=last_ans_count,
                      last_position=last_position, last_try_count=last_try_count,last_word=last_word, mutex=mutex)
-        print("1")
-        print(user)
         session.add(user)
-        print("2")
-        print(user)
         session.commit()
-        print("3")
-        print(user)
         session.close()
-        print("4")
-        print(user)
-        return user
 
     def Find(self,User_id):
         session = Session()
@@ -93,11 +84,8 @@ class Users(Base):
             if mutex is not None:
                 FindUser.mutex = mutex
             session.add(FindUser)
-            session.commit()
-        print(FindUser)    
+            session.commit()  
         session.close()
-        print(FindUser)
-        return FindUser
 
 class Learning(Base):
     __tablename__ = 'Learning'
@@ -114,7 +102,6 @@ class Learning(Base):
         session.add(learn)
         session.commit()
         session.close()
-        return learn
 
     def Find(self, User_id, word):
         session = Session()
@@ -133,7 +120,6 @@ class Learning(Base):
             session.add(FindLearn)
             session.commit()
         session.close()
-        return FindLearn
 
 Base.metadata.create_all(engine)
     
@@ -165,7 +151,8 @@ def incoming():
     print("Ищем юзера")
     if not FindUser:
         print("Создаем нового юзера")
-        FindUser = UsersDB.Create(User_id=chatID,Name= FName)
+        UsersDB.Create(User_id=chatID,Name= FName)
+        FindUser = UsersDB.Find(User_id = chatID)
         print(FindUser.Name)
         print(FindUser.mutex)
         print("Создали")
@@ -176,7 +163,8 @@ def incoming():
         return "end"
     else:
         print("Лочим мутекс обновляем пользователя в бд")
-        FindUser = UsersDB.Update(chatID,mutex=1)
+        UsersDB.Update(chatID,mutex=1)
+        FindUser = UsersDB.Find(User_id = chatID)
         print("Обновили")
     go_button = {"keyboard": [["Начать игру"],["Просмотр прогресса"]], "resize_keyboard": True}
     print("чек ласт позишона !")
@@ -192,23 +180,27 @@ def incoming():
         print("Реакция на СТАРТ Конец")
     if text == '/start' and FindUser.last_position != -1:
         print("Освобождаем мутекс и выкидываем запрос из за повторного нажатия старт")
-        FindUser = UsersDB.Update(chatID, mutex=0)
+        UsersDB.Update(chatID, mutex=0)
+        FindUser = UsersDB.Find(User_id = chatID)
         print("Успешно")
         return Response(status=200)
     print(text)
     if text == "Отложить":
         print("Откладываем игру на потом, освобождаем мутекс")
-        FindUser = UsersDB.Update(chatID, mutex=0)
+        UsersDB.Update(chatID, mutex=0)
+        FindUser = UsersDB.Find(User_id = chatID)
         print("Готово")
         return "end"
 
     if text == "Начать игру" and FindUser.last_position == -1:
         print("Начинаем игру, обновляем БД юзера")
-        FindUser = UsersDB.Update(User_id=FindUser.User_id,last_ans_count= 0,last_try_count=FindUser.last_try_count +1 ,last_position= 0)
+        UsersDB.Update(User_id=FindUser.User_id,last_ans_count= 0,last_try_count=FindUser.last_try_count +1 ,last_position= 0)
+        FindUser = UsersDB.Find(User_id = chatID)
         print("Обновили")
     if text == "Начать игру" and FindUser.last_position > 0:
         print("Повторная попытка начать игру, выкидываем запрос в мусорку")
-        FindUser = UsersDB.Update(chatID, mutex=0)
+        UsersDB.Update(chatID, mutex=0)
+        FindUser = UsersDB.Find(User_id = chatID)
         print("Выкинули")
         return Response(status=200)
 
@@ -221,15 +213,17 @@ def incoming():
         if text == "привести пример":
             params['text'] = random.choice(word['examples'])
             requests.get(URL + "/sendMessage", params=params)
-            FindUser = UsersDB.Update(chatID, mutex=0)
+            UsersDB.Update(chatID, mutex=0)
+            FindUser = UsersDB.Find(User_id = chatID)
             return 'end'
         else:
             if text== word['translation']:
                 params['text'] = 'А ты молодец) Правильный ответ!'
                 requests.get(URL + "/sendMessage", params=params, proxies=proxies)
-                FindUser = UsersDB.Update(User_id=FindUser.User_id,
+                UsersDB.Update(User_id=FindUser.User_id,
                                last_ans_count=(FindUser.last_ans_count+1),
                                last_ans = str(datetime.datetime.now()))
+                FindUser = UsersDB.Find(User_id = chatID)
                 count = LearningDB.Find(User_id= chatID,word = word['word'])
                 if not count:
                     LearningDB.Create(User_id= chatID,word=word['word'],count_=1,last_ans=str(datetime.datetime.now()))
@@ -239,7 +233,8 @@ def incoming():
                 params['text'] = f'К сожалению это неправильный ответ =( ' \
                                  f'На самом деле это: {word["translation"]}'
                 requests.get(URL + "/sendMessage", params=params)
-                FindUser = UsersDB.Update(User_id= chatID,last_ans= str(datetime.datetime.now()))
+                UsersDB.Update(User_id= chatID,last_ans= str(datetime.datetime.now()))
+                FindUser = UsersDB.Find(User_id = chatID)
 
     if FindUser.last_position in range(0, stgs.count):
         isFind = False
@@ -271,9 +266,11 @@ def incoming():
         params['reply_markup'] = json.dumps(reply_markup)
         params['text'] = word['word']
 
-        FindUser = UsersDB.Update(User_id=chatID,last_word=word['word'], last_position=FindUser.last_position+1)
+        UsersDB.Update(User_id=chatID,last_word=word['word'], last_position=FindUser.last_position+1)
+        FindUser = UsersDB.Find(User_id = chatID)
         requests.get(URL + "/sendMessage", params=params)
-        FindUser = UsersDB.Update(chatID, mutex=0)
+        UsersDB.Update(chatID, mutex=0)
+        FindUser = UsersDB.Find(User_id = chatID)
         return "end"
     if FindUser.last_position >= stgs.count:
 
@@ -282,7 +279,8 @@ def incoming():
         params['reply_markup'] = json.dumps(go_button)
         requests.get(URL + "/sendMessage", params=params)
         UsersDB.Update(User_id=chatID, last_word='', last_position=-1, last_ans_count=0)
-        FindUser = UsersDB.Update(chatID, mutex=0)
+        UsersDB.Update(chatID, mutex=0)
+        FindUser = UsersDB.Find(User_id = chatID)
         return "end"
 
     if text == "Просмотр прогресса":
@@ -299,7 +297,8 @@ def incoming():
                          f'{last_ans}'
         session.close()
         requests.get(URL + "/sendMessage", params=params)
-    FindUser = UsersDB.Update(chatID, mutex=0)
+    UsersDB.Update(chatID, mutex=0)
+    FindUser = UsersDB.Find(User_id = chatID)
     return "end"
 
 @app.route('/', methods=['GET'])
