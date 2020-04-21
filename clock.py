@@ -12,7 +12,7 @@ from datetime import date
 import datetime
 
 Base = declarative_base()
-engine = create_engine('sqlite:///example.db',connect_args={'check_same_thread': False})
+engine = create_engine('postgres://enxkniceyqqomp:e191eb2cfd81e6311cb78104205e3fde97ebb8aab36e76013320bf34d6a9ff41@ec2-46-137-156-205.eu-west-1.compute.amazonaws.com:5432/d1e5a7pi1nolg1',echo=True)
 Base.metadata.create_all(engine)
 
 TOKEN = "954911221:AAF12xXEVwl2KRsy1Qe0RvWcm-6bmd2MW7k"
