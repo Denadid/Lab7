@@ -65,7 +65,7 @@ class Users(Base):
         print("тип юзера в креате перед ретурном !:")
         print(type(user))
         print("Юзер в креате перед ретурном !:")
-        print(user.Name)
+        print(user)
         return user
 
     def Find(self,User_id):
