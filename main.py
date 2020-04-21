@@ -181,7 +181,7 @@ def incoming():
         print("Обновили")
     go_button = {"keyboard": [["Начать игру"],["Просмотр прогресса"]], "resize_keyboard": True}
     print("чек ласт позишона")
-     print(FindUser.last_position)
+    print(FindUser.last_position)
     if text == '/start' and FindUser.last_position == -1:
         print("Реакция на СТАРТ")
         params["text"] = f'Привет {FName}, давай сыграем в игру, где я буду давать тебе какое-нибудь слово на ' \
