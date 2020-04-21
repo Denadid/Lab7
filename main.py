@@ -57,11 +57,16 @@ class Users(Base):
         session = Session()
         user = Users(User_id=User_id, Name=Name, last_ans=last_ans, last_ans_count=last_ans_count,
                      last_position=last_position, last_try_count=last_try_count,last_word=last_word, mutex=mutex)
+        print("1")
         print(user)
         session.add(user)
+        print("2")
+        print(user)
         session.commit()
+        print("3")
         print(user)
         session.close()
+        print("4")
         print(user)
         return user
 
