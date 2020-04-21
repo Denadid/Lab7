@@ -283,8 +283,10 @@ def settings():
     session = Session()
     stgs = session.query(Settings).first()
     session.close()
-    return render_template("settings.html", time=stgs.time,count=stgs.count,right=stgs.right)
-
+    if stgs is not None: 
+        return render_template("settings.html", time=stgs.time,count=stgs.count,right=stgs.right)
+    else:
+        return render_template("settings.html", time=2,count=2,right=2)
 
 @app.route('/setup', methods=['POST'])
 def setup():
