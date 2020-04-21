@@ -304,7 +304,7 @@ def setup():
         session.commit()
     else:
         stgsCr = Settings(id=1, time=time, count=count, right=right)
-        session.add(stgs)
+        session.add(stgsCr)
         session.commit()
     session.close()
     print("Done !!!!!!!!!!")
