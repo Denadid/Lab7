@@ -13,7 +13,7 @@ import datetime
 app = Flask(__name__)
 Base = declarative_base()
 engine = create_engine('postgres://enxkniceyqqomp:e191eb2cfd81e6311cb78104205e3fde97ebb8aab36e76013320bf34d6a9ff41@ec2-46-137-156-205.eu-west-1.compute.amazonaws.com:5432/d1e5a7pi1nolg1',echo=True)
-Base.metadata.create_all(engine)
+
 
 Base.metadata.bind = engine
 Session = sessionmaker(bind=engine)
@@ -125,6 +125,8 @@ class Learning(Base):
         session.close()
         return FindLearn
 
+Base.metadata.create_all(engine)
+    
 UsersDB = Users()
 LearningDB = Learning()
 
