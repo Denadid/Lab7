@@ -219,7 +219,7 @@ def incoming():
         else:
             if text== word['translation']:
                 params['text'] = 'А ты молодец) Правильный ответ!'
-                requests.get(URL + "/sendMessage", params=params, proxies=proxies)
+                requests.get(URL + "/sendMessage", params=params)
                 UsersDB.Update(User_id=FindUser.User_id,
                                last_ans_count=(FindUser.last_ans_count+1),
                                last_ans = str(datetime.datetime.now()))
