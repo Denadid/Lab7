@@ -42,11 +42,11 @@ class Users(Base):
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=30)
+@sched.scheduled_job('interval', seconds=30)
 def timed_job1():
     params = {"text": 'Не спать!'}
     print('Не спать!')
-    requests.get("https://65db1cf0.ngrok.io", params=params)
+    requests.get("https://telebotdenis.herokuapp.com/", params=params)
 
 @sched.scheduled_job('interval', seconds=5)
 def timed_job():
