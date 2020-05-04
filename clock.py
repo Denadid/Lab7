@@ -12,7 +12,7 @@ from datetime import date
 import datetime
 
 Base = declarative_base()
-engine = create_engine('postgres://enxkniceyqqomp:e191eb2cfd81e6311cb78104205e3fde97ebb8aab36e76013320bf34d6a9ff41@ec2-46-137-156-205.eu-west-1.compute.amazonaws.com:5432/d1e5a7pi1nolg1',echo=True)
+engine = create_engine('postgres://xuqqymsjxtdnvr:75ab50a3f24b78fc6bca57b53132af6e0cf5bb3d8421f079f8d0fe9e064dabc7@ec2-54-247-94-127.eu-west-1.compute.amazonaws.com:5432/dcep7u764ksdbe',echo=True)
 Base.metadata.create_all(engine)
 
 TOKEN = "954911221:AAF12xXEVwl2KRsy1Qe0RvWcm-6bmd2MW7k"
