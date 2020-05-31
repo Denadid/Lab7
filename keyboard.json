@@ -1,0 +1,16 @@
+{
+    "keyboard": [
+        [
+            "word1",
+            "word2"
+        ],
+        [
+            "word3",
+            "word4"
+        ],
+        [
+            "привести пример"
+        ]
+    ],
+    "resize_keyboard": true
+}

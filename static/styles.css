@@ -1,0 +1,56 @@
+body{
+	background-image: url("fon.jpg");
+}
+
+
+.front{
+	text-align: center;
+	background-color: white;
+	border-radius: 10px;
+	margin: 5% 30%;
+	padding: 50px;
+}
+
+a{
+	border: solid #444 2px;
+	background-color: #444;
+	border-radius: 5px;
+	color: white;
+	text-decoration: none;
+	padding: 5px 30px;
+	font-size: 20px;
+}
+
+a:hover{
+	border: solid #666 2px;
+	background-color: #666;
+}
+
+label{
+	border-bottom: #666 solid 2px;
+	display: block;
+	margin-bottom: 20px;
+	padding: 5px;
+	font-size: 24px;
+}
+
+label input{
+	font-size: 20px;
+	border-radius: 5px;
+	text-align: center;
+	margin-top: 10px;
+}
+
+button{
+	border: solid #444 2px;
+	background-color: #444;
+	border-radius: 5px;
+	color: white;
+	text-decoration: none;
+	padding: 5px 30px;
+	font-size: 20px;
+}
+button:hover{
+	border: solid #666 2px;
+	background-color: #666;
+}
